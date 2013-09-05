@@ -13,7 +13,7 @@ zgo
 **手动安装**
 自己手动从 github 下载代码后，放置在你的 $GOPATH 的 src/github.com/nutzam/zgo 目录下
 
-	go install github.com/nutzam/go
+	go install github.com/nutzam/zgo
 	
 **安装成功的标志**
 
