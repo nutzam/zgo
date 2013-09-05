@@ -1,4 +1,3 @@
-// Provide a common utility library
 package z
 
 import (

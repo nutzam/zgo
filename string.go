@@ -1,24 +1,9 @@
 package z
 
 import (
-	"errors"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 )
-
-// 将一个字节数组转换成 utf-8 字符串
-func Utf8(bs []byte) (str string, err error) {
-	if utf8.FullRune(bs) {
-		//sz := utf8.RuneCount(bs)
-		str = string(bs)
-		return
-	}
-	// 错误
-	err = errors.New("fail to decode to UTF8")
-	str = ""
-	return
-}
 
 // 判断一个字符串是不是空白串，即（0x00 - 0x20 之内的字符均为空白字符）
 func IsBlank(s string) bool {

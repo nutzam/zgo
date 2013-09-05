@@ -2,34 +2,12 @@ package z
 
 import (
 	"bufio"
-	"bytes"
-	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
 )
-
-// 根据给定路径获取绝对路径，可以支持 ~ 作为主目录
-func Ph(ph string) string {
-	if IsBlank(ph) {
-		return ""
-	}
-	if strings.HasPrefix(ph, "~") {
-		home := os.Getenv("HOME")
-		if IsBlank(home) {
-			panic(fmt.Sprintf("can not found HOME in envs, '%s' AbsPh Failed!", ph))
-		}
-		ph = fmt.Sprint(home, string(ph[1:]))
-	}
-	s, err := filepath.Abs(ph)
-	if nil != err {
-		panic(err)
-	}
-	return s
-}
 
 // 创建一个目录，如果目录存在或者创建成功，返回 true，否则返回 false
 func Mkdir(ph string) error {
@@ -180,17 +158,12 @@ func RemoveAll(ph string) error {
 
 // 移动文件或文件夹
 func Fmove(frompath, topath string) error {
-	var stderr bytes.Buffer
 	// 确保父目录存在
 	FcheckParents(topath)
-	cmd := exec.Command("/bin/mv", frompath, topath)
-	cmd.Stderr = &stderr
-	cmd.Run()
-	sErr := stderr.String()
-	if len(sErr) != 0 {
-		return fmt.Errorf(sErr)
-	}
-	return nil
+	// 移动
+	e := os.Rename(frompath, topath)
+	// 返回
+	return e
 }
 
 // 通过文件结尾读取类型

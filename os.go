@@ -14,6 +14,11 @@ import (
 	"strings"
 )
 
+/*
+#include "md5.h"
+*/
+import "C"
+
 // 获取本地MAC地址，只限Linux系统
 func GetMac() string {
 	var mac string
@@ -37,21 +42,11 @@ func GetMac() string {
 
 // 计算一个文件的 MD5 指纹, 文件路径为磁盘绝对路径
 func MD5(ph string) string {
-	var md5 string
-	var stdout, stderr bytes.Buffer
-	cmd := exec.Command("/usr/bin/md5sum", ph)
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	cmd.Run()
-	sOut := stdout.String()
-	sErr := stderr.String()
-	if len(sErr) == 0 {
-		md5Src := strings.Split(Trim(sOut), " ")
-		md5 = Trim(md5Src[0])
-	} else {
-		log.Panic(sErr)
-	}
-	return md5
+	md5 := C.CString("")
+	file := C.CString(ph)
+	C.md5sum(file, md5)
+	md5sum := C.GoString(md5)
+	return md5sum
 }
 
 // 对字符串进行SHA1哈希
