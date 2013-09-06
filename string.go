@@ -1,6 +1,7 @@
 package z
 
 import (
+	"bytes"
 	"errors"
 	"strconv"
 	"strings"
@@ -118,4 +119,83 @@ func TrimBytes(bs []byte) string {
 		}
 	}
 	return string(bs[l : r+1])
+}
+
+// 复制字符
+func DupChar(char byte, num int) string {
+	sb := SBuilder()
+	for i := 0; i < num; i++ {
+		sb.AppendByte(char)
+	}
+	return sb.String()
+}
+
+// 复制字符串
+func Dup(str string, num int) string {
+	sb := SBuilder()
+	for i := 0; i < num; i++ {
+		sb.Append(str)
+	}
+	return sb.String()
+}
+
+// 填充字符串右侧一定数量的特殊字符
+func AlignLeft(str string, width int, char byte) string {
+	length := len(str)
+	if length < width {
+		return str + DupChar(char, width-length)
+	}
+	return str
+}
+
+// 填充字符串左侧一定数量的特殊字符
+func AlignRight(str string, width int, char byte) string {
+	length := len(str)
+	if length < width {
+		return DupChar(char, width-length) + str
+	}
+	return str
+}
+
+type stringBuilder struct {
+	buf *bytes.Buffer
+}
+
+// 提供一个类似java中stringBuilder对象,支持链式写入值(不返回错误信息)
+func SBuilder() *stringBuilder {
+	sb := new(stringBuilder)
+	sb.buf = bytes.NewBuffer(nil)
+	return sb
+}
+
+func (sb *stringBuilder) Append(str string) *stringBuilder {
+	_, err := sb.buf.WriteString(str)
+	if err != nil {
+		panic(err)
+	}
+	return sb
+}
+
+func (sb *stringBuilder) AppendByte(char byte) *stringBuilder {
+	err := sb.buf.WriteByte(char)
+	if err != nil {
+		panic(err)
+	}
+	return sb
+}
+
+func (sb *stringBuilder) AppendByteArray(chars []byte) *stringBuilder {
+	sb.AppendByte('[')
+	for i, char := range chars {
+		sb.AppendByte('\'').AppendByte(char).AppendByte('\'')
+		if i != len(chars)-1 {
+			sb.Append(", ")
+		}
+	}
+	sb.AppendByte(']')
+	return sb
+}
+
+func (sb *stringBuilder) String() string {
+	return sb.buf.String()
 }
