@@ -200,6 +200,26 @@ func FindDirHeadFile(ph string, head string) string {
 	return name
 }
 
+// 拷贝文件
+func CopyFile(src, dst string) (err error) {
+	FcheckParents(dst)
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+	dstFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+	_, err = io.Copy(dstFile, srcFile)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // 目录大小
 func DirSize(path string) int64 {
 	var size int64
