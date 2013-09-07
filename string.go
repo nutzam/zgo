@@ -193,7 +193,8 @@ type stringBuilder struct {
 	buf *bytes.Buffer
 }
 
-// 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息)
+// 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息,直接panic)
+// 比如 str := SBuilder().Append("abc=123").AppendByte('\n').String()
 func SBuilder() *stringBuilder {
 	sb := new(stringBuilder)
 	sb.buf = bytes.NewBuffer(nil)
