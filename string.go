@@ -25,7 +25,7 @@ func Utf8(bs []byte) (str string, err error) {
 func IsBlank(s string) bool {
 	for i := 0; i < len(s); i++ {
 		b := s[i]
-		if b < 0 || b > 0x20 {
+		if b < 0x00 || b > 0x20 {
 			return false
 		}
 	}
