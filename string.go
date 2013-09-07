@@ -21,11 +21,19 @@ func Utf8(bs []byte) (str string, err error) {
 	return
 }
 
+// 是不是空字符
+func IsSpace(c byte) bool {
+	if c >= 0x00 && c <= 0x20 {
+		return true
+	}
+	return false
+}
+
 // 判断一个字符串是不是空白串，即（0x00 - 0x20 之内的字符均为空白字符）
 func IsBlank(s string) bool {
 	for i := 0; i < len(s); i++ {
 		b := s[i]
-		if b < 0x00 || b > 0x20 {
+		if !IsSpace(b) {
 			return false
 		}
 	}
@@ -119,6 +127,30 @@ func TrimBytes(bs []byte) string {
 		}
 	}
 	return string(bs[l : r+1])
+}
+
+// 去掉多余的字符串
+// 比如 " a b  c    d e" -> "a b c d e"
+func TrimExtraSpace(s string) string {
+	s = Trim(s)
+	size := len(s)
+	sb := SBuilder()
+	isSpace := false
+	for i := 0; i < size; i++ {
+		c := s[i]
+		if !IsSpace(c) {
+			if isSpace {
+				sb.AppendByte(' ')
+				isSpace = false
+			}
+			sb.AppendByte(c)
+		} else {
+			if !isSpace {
+				isSpace = true
+			}
+		}
+	}
+	return sb.String()
 }
 
 // 复制字符
