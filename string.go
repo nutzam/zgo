@@ -161,13 +161,14 @@ type stringBuilder struct {
 	buf *bytes.Buffer
 }
 
-// 提供一个类似java中stringBuilder对象,支持链式写入值(不返回错误信息)
+// 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息)
 func SBuilder() *stringBuilder {
 	sb := new(stringBuilder)
 	sb.buf = bytes.NewBuffer(nil)
 	return sb
 }
 
+// 添加字符串
 func (sb *stringBuilder) Append(str string) *stringBuilder {
 	_, err := sb.buf.WriteString(str)
 	if err != nil {
@@ -176,6 +177,7 @@ func (sb *stringBuilder) Append(str string) *stringBuilder {
 	return sb
 }
 
+// 添加字符
 func (sb *stringBuilder) AppendByte(char byte) *stringBuilder {
 	err := sb.buf.WriteByte(char)
 	if err != nil {
@@ -184,6 +186,7 @@ func (sb *stringBuilder) AppendByte(char byte) *stringBuilder {
 	return sb
 }
 
+// 添加字符数组, 会自动添加"[]"并用","做分割
 func (sb *stringBuilder) AppendByteArray(chars []byte) *stringBuilder {
 	sb.AppendByte('[')
 	for i, char := range chars {
@@ -196,6 +199,20 @@ func (sb *stringBuilder) AppendByteArray(chars []byte) *stringBuilder {
 	return sb
 }
 
+// 添加字符串数组, 会自动添加"[]"并用","做分割
+func (sb *stringBuilder) AppendStringArray(strs []string) *stringBuilder {
+	sb.AppendByte('[')
+	for i, str := range strs {
+		sb.AppendByte('\'').Append(str).AppendByte('\'')
+		if i != len(strs)-1 {
+			sb.Append(", ")
+		}
+	}
+	sb.AppendByte(']')
+	return sb
+}
+
+// 返回字符串
 func (sb *stringBuilder) String() string {
 	return sb.buf.String()
 }
