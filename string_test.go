@@ -27,3 +27,15 @@ func Test_Trim_Extra_Space(t *testing.T) {
 		t.Errorf("can't trim [%s]", s1)
 	}
 }
+
+func Test_Dup_Char(t *testing.T) {
+	if z.DupChar('a', 5) != "aaaaa" {
+		t.Error("DupChar 'a' 5 times != 'aaaaa'")
+	}
+}
+
+func Test_Dup(t *testing.T) {
+	if z.Dup("abc", 3) != "abcabcabc" {
+		t.Error("Dup 'abc' 3 times != 'abcabcabc'")
+	}
+}
