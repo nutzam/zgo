@@ -126,7 +126,7 @@ func TrimBytes(bs []byte) string {
 	return string(bs[l : r+1])
 }
 
-// 去掉多余的字符串
+// Trim并且去掉中间多余的空白(多个空白变一个空白)
 // 比如 " a b  c    d e" -> "a b c d e"
 func TrimExtraSpace(s string) string {
 	s = Trim(s)
