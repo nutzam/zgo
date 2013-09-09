@@ -39,3 +39,18 @@ func Test_Dup(t *testing.T) {
 		t.Error("Dup 'abc' 3 times != 'abcabcabc'")
 	}
 }
+
+func Test_SBuilder(t *testing.T) {
+	sb := z.SBuilder()
+	sb.Append("abc")
+	if sb.String() != "abc" {
+		t.Errorf("sb has error, should be %s, but be %s", "abc", sb.String())
+	}
+	sb.AppendByte('d')
+	if sb.String() != "abcd" {
+		t.Errorf("sb has error, should be %s, but be %s", "abcd", sb.String())
+	}
+	if sb.Len() != 4 {
+		t.Errorf("sb length should be 4, but be %d", sb.Len())
+	}
+}

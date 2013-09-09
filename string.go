@@ -249,3 +249,8 @@ func (sb *stringBuilder) AppendStringArray(strs []string) *stringBuilder {
 func (sb *stringBuilder) String() string {
 	return sb.buf.String()
 }
+
+// 写入的字符串长度
+func (sb *stringBuilder) Len() int {
+	return sb.buf.Len()
+}
