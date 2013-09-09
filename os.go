@@ -16,6 +16,9 @@ import (
 )
 
 /*
+#cgo CFLAGS: -DPNG_DEBUG=1
+#cgo linux CFLAGS: -DLINUX=1
+#cgo LDFLAGS: -lpng
 #include <stdio.h>
 #include <stdlib.h>
 #include "md5.h"
