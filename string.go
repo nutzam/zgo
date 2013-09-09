@@ -21,11 +21,19 @@ func Utf8(bs []byte) (str string, err error) {
 	return
 }
 
+// 是不是空字符
+func IsSpace(c byte) bool {
+	if c >= 0x00 && c <= 0x20 {
+		return true
+	}
+	return false
+}
+
 // 判断一个字符串是不是空白串，即（0x00 - 0x20 之内的字符均为空白字符）
 func IsBlank(s string) bool {
 	for i := 0; i < len(s); i++ {
 		b := s[i]
-		if b < 0 || b > 0x20 {
+		if !IsSpace(b) {
 			return false
 		}
 	}
@@ -65,9 +73,7 @@ func SplitIgnoreBlank(s, sep string) []string {
 	re := make([]string, 0, size)
 	for i := 0; i < size; i++ {
 		str := Trim(ss[i])
-		//log.Printf("%d : '%s'", i, str)
 		if len(str) > 0 {
-			//log.Printf("  append @ [%d]", len(re))
 			re = append(re, str)
 		}
 	}
@@ -75,6 +81,7 @@ func SplitIgnoreBlank(s, sep string) []string {
 }
 
 // 去掉一个字符串左右的空白串，即（0x00 - 0x20 之内的字符均为空白字符）
+// 与strings.TrimSpace功能一致
 func Trim(s string) string {
 	size := len(s)
 	if size <= 0 {
@@ -83,16 +90,14 @@ func Trim(s string) string {
 	l := 0
 	for ; l < size; l++ {
 		b := s[l]
-		if b < 0 || b > 0x20 {
-			//log.Printf("l stop %d : '%c'", l, b)
+		if !IsSpace(b) {
 			break
 		}
 	}
 	r := size - 1
 	for ; r >= l; r-- {
 		b := s[r]
-		if b < 0 || b > 0x20 {
-			//log.Printf("r stop %d : '%c'", r, b)
+		if !IsSpace(b) {
 			break
 		}
 	}
@@ -108,35 +113,60 @@ func TrimBytes(bs []byte) string {
 	l := 0
 	for ; l <= r; l++ {
 		b := bs[l]
-		if b < 0 || b > 0x20 {
+		if !IsSpace(b) {
 			break
 		}
 	}
 	for ; r >= l; r-- {
 		b := bs[r]
-		if b < 0 || b > 0x20 {
+		if !IsSpace(b) {
 			break
 		}
 	}
 	return string(bs[l : r+1])
 }
 
+// 去掉多余的字符串
+// 比如 " a b  c    d e" -> "a b c d e"
+func TrimExtraSpace(s string) string {
+	s = Trim(s)
+	size := len(s)
+	switch size {
+	case 0, 1, 2, 3:
+		return s
+	default:
+		bs := make([]byte, 0, size)
+		isSpace := false
+		for i := 0; i < size; i++ {
+			c := s[i]
+			if !IsSpace(c) {
+				if isSpace {
+					bs = append(bs, ' ')
+					isSpace = false
+				}
+				bs = append(bs, c)
+			} else {
+				if !isSpace {
+					isSpace = true
+				}
+			}
+		}
+		return string(bs)
+	}
+}
+
 // 复制字符
 func DupChar(char byte, num int) string {
-	sb := SBuilder()
+	bs := make([]byte, num, num)
 	for i := 0; i < num; i++ {
-		sb.AppendByte(char)
+		bs[i] = char
 	}
-	return sb.String()
+	return string(bs)
 }
 
 // 复制字符串
 func Dup(str string, num int) string {
-	sb := SBuilder()
-	for i := 0; i < num; i++ {
-		sb.Append(str)
-	}
-	return sb.String()
+	return strings.Repeat(str, num)
 }
 
 // 填充字符串右侧一定数量的特殊字符
@@ -161,13 +191,15 @@ type stringBuilder struct {
 	buf *bytes.Buffer
 }
 
-// 提供一个类似java中stringBuilder对象,支持链式写入值(不返回错误信息)
+// 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息,直接panic)
+// 比如 str := SBuilder().Append("abc=123").AppendByte('\n').String()
 func SBuilder() *stringBuilder {
 	sb := new(stringBuilder)
 	sb.buf = bytes.NewBuffer(nil)
 	return sb
 }
 
+// 添加字符串
 func (sb *stringBuilder) Append(str string) *stringBuilder {
 	_, err := sb.buf.WriteString(str)
 	if err != nil {
@@ -176,6 +208,7 @@ func (sb *stringBuilder) Append(str string) *stringBuilder {
 	return sb
 }
 
+// 添加字符
 func (sb *stringBuilder) AppendByte(char byte) *stringBuilder {
 	err := sb.buf.WriteByte(char)
 	if err != nil {
@@ -184,6 +217,7 @@ func (sb *stringBuilder) AppendByte(char byte) *stringBuilder {
 	return sb
 }
 
+// 添加字符数组, 会自动添加"[]"并用","做分割
 func (sb *stringBuilder) AppendByteArray(chars []byte) *stringBuilder {
 	sb.AppendByte('[')
 	for i, char := range chars {
@@ -196,6 +230,20 @@ func (sb *stringBuilder) AppendByteArray(chars []byte) *stringBuilder {
 	return sb
 }
 
+// 添加字符串数组, 会自动添加"[]"并用","做分割
+func (sb *stringBuilder) AppendStringArray(strs []string) *stringBuilder {
+	sb.AppendByte('[')
+	for i, str := range strs {
+		sb.AppendByte('\'').Append(str).AppendByte('\'')
+		if i != len(strs)-1 {
+			sb.Append(", ")
+		}
+	}
+	sb.AppendByte(']')
+	return sb
+}
+
+// 返回字符串
 func (sb *stringBuilder) String() string {
 	return sb.buf.String()
 }

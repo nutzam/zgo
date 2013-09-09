@@ -3,6 +3,7 @@ package z
 import (
 	"bytes"
 	"encoding/json"
+	simplejson "github.com/bitly/go-simplejson"
 	"io"
 	"log"
 	"strings"
@@ -28,7 +29,7 @@ func JsonDecode(r io.Reader, v interface{}) error {
 }
 
 // 将一个interface{}转换为一个simplejson.Json对象指针返回
-func InterfaceToJson(data *interface{}) (*Json, error) {
+func InterfaceToJson(data *interface{}) (*simplejson.Json, error) {
 	// 将interface转换为byte
 	jsData, jsDataErr := json.Marshal(*data)
 	if jsDataErr != nil {
@@ -42,9 +43,9 @@ func InterfaceToJson(data *interface{}) (*Json, error) {
 }
 
 // 将Byte转换为一个simplejson.Json对象指针返回
-func ByteToJson(data *[]byte) (*Json, error) {
+func ByteToJson(data *[]byte) (*simplejson.Json, error) {
 	// 解析JSON结构
-	js, jsonErr := NewJson(*data)
+	js, jsonErr := simplejson.NewJson(*data)
 	if jsonErr != nil {
 		return nil, jsonErr
 	}
