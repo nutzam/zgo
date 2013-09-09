@@ -153,6 +153,8 @@ func TrimExtraSpace(s string) string {
 		}
 		return string(bs)
 	}
+	// 兼容低版本GO
+	return ""
 }
 
 // 复制字符
