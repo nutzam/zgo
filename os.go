@@ -12,9 +12,12 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"unsafe"
 )
 
 /*
+#include <stdio.h>
+#include <stdlib.h>
 #include "md5.h"
 */
 import "C"
@@ -46,6 +49,7 @@ func MD5(ph string) string {
 	file := C.CString(ph)
 	C.md5sum(file, md5)
 	md5sum := C.GoString(md5)
+	defer C.free(unsafe.Pointer(file))
 	return md5sum
 }
 
