@@ -22,5 +22,5 @@ func IndexOfStrings(array []string, one string) int {
 
 // 判断字符串是否在数组中
 func IsInStrings(array []string, one string) bool {
-	return IndexOfStrings(array, one) > 0
+	return IndexOfStrings(array, one) > -1
 }
