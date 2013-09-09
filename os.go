@@ -45,11 +45,15 @@ func GetMac() string {
 
 // 计算一个文件的 MD5 指纹, 文件路径为磁盘绝对路径
 func MD5(ph string) string {
-	md5 := C.CString("")
+	md5 := C.CString("00000000000000000000000000000000")
 	file := C.CString(ph)
 	C.md5sum(file, md5)
 	md5sum := C.GoString(md5)
+	defer C.free(unsafe.Pointer(md5))
 	defer C.free(unsafe.Pointer(file))
+	if md5sum == "00000000000000000000000000000000" {
+		return ""
+	}
 	return md5sum
 }
 
