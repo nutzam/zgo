@@ -59,15 +59,4 @@ func Test_Region(t *testing.T) {
 	if r4.LeftDate().Unix() != time.Date(2013, 5, 22, 0, 0, 0, 0, time.Local).Unix() {
 		t.Error("left should be 2013-05-22")
 	}
-
-	//t1, err := time.Parse("2006-01-02", "2013-09-10")
-	//if err != nil {
-	//	t.Error(err)
-	//}
-
-	//withNanos := "2006-01-02 15:04:05"
-	//t2, err2 := time.Parse(withNanos, "2013-10-05 18:30:50")
-	//if err2 != nil {
-	//	t.Error(err2)
-	//}
 }
