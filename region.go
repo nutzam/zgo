@@ -8,11 +8,49 @@ import (
 	"time"
 )
 
+type rtype int
+
+const (
+	intRegion rtype = iota
+	longRegion
+	floatRegion
+	float64Region
+	dateRegion
+)
+
 type Region struct {
 	Left      interface{}
 	Right     interface{}
 	LeftOpen  bool
 	RightOpen bool
+	_type_    rtype
+}
+
+func (r *Region) String() string {
+	sb := SBuilder()
+	if r.LeftOpen {
+		sb.Append("(")
+	} else {
+		sb.Append("[")
+	}
+	switch r._type_ {
+	case intRegion:
+		sb.Append(r.LeftInt()).Append(",").Append(r.RightInt())
+	case longRegion:
+		sb.Append(r.LeftLong()).Append(",").Append(r.RightLong())
+	case floatRegion:
+		sb.Append(r.LeftFloat()).Append(",").Append(r.RightFloat())
+	case float64Region:
+		sb.Append(r.LeftFloat64()).Append(",").Append(r.RightFloat64())
+	case dateRegion:
+		sb.Append(r.LeftDate()).Append(",").Append(r.RightDate())
+	}
+	if r.RightOpen {
+		sb.Append(")")
+	} else {
+		sb.Append("]")
+	}
+	return sb.String()
 }
 
 // 正负整数
@@ -32,12 +70,12 @@ func MakeRegion(rstr string) *Region {
 	leftstr, rightstr, leftOpen, rightOpen := extractLeftAndRight(rstr)
 	r.LeftOpen = leftOpen
 	r.RightOpen = rightOpen
-	r.Left = toAppropriateType(leftstr)
-	r.Right = toAppropriateType(rightstr)
+	r.Left, r._type_ = toAppropriateType(leftstr)
+	r.Right, _ = toAppropriateType(rightstr)
 	return r
 }
 
-func toAppropriateType(str string) interface{} {
+func toAppropriateType(str string) (interface{}, rtype) {
 	regInt := regexp.MustCompile(REX_INT)
 	if regInt.MatchString(str) {
 		sint, err1 := strconv.Atoi(str)
@@ -46,10 +84,10 @@ func toAppropriateType(str string) interface{} {
 			if err2 != nil {
 				panic(err2)
 			} else {
-				return sint64
+				return sint64, longRegion
 			}
 		} else {
-			return sint
+			return sint, intRegion
 		}
 	}
 	regFloat := regexp.MustCompile(REX_FLOAT)
@@ -60,10 +98,10 @@ func toAppropriateType(str string) interface{} {
 			if err2 != nil {
 				panic(err2)
 			} else {
-				return sfloat64
+				return sfloat64, float64Region
 			}
 		} else {
-			return float32(sfloat)
+			return float32(sfloat), floatRegion
 		}
 	}
 	regDateTime := regexp.MustCompile(REX_DATE_TIME)
@@ -72,7 +110,7 @@ func toAppropriateType(str string) interface{} {
 		if err1 != nil {
 			panic(err1)
 		} else {
-			return sdatetime
+			return sdatetime, dateRegion
 		}
 	}
 	regDate := regexp.MustCompile(REX_DATE)
@@ -81,7 +119,7 @@ func toAppropriateType(str string) interface{} {
 		if err1 != nil {
 			panic(err1)
 		} else {
-			return sdate
+			return sdate, dateRegion
 		}
 	}
 	// 没有可以匹配的?
