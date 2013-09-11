@@ -223,7 +223,7 @@ func (sb *strBuilder) Append(o interface{}) *strBuilder {
 }
 
 // 行到结尾了, 换行
-func (sb *strBuilder) EndLine() *strBuilder {
+func (sb *strBuilder) LineEnd() *strBuilder {
 	sb.Append('\n')
 	return sb
 }
