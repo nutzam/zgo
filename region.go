@@ -16,6 +16,7 @@ const (
 	floatRegion
 	float64Region
 	dateRegion
+	nilValue
 )
 
 type Region struct {
@@ -70,12 +71,27 @@ func MakeRegion(rstr string) *Region {
 	leftstr, rightstr, leftOpen, rightOpen := extractLeftAndRight(rstr)
 	r.LeftOpen = leftOpen
 	r.RightOpen = rightOpen
-	r.Left, r._type_ = toAppropriateType(leftstr)
-	r.Right, _ = toAppropriateType(rightstr)
+
+	var rt rtype
+	r.Left, rt = toAppropriateType(leftstr)
+	if rt != nilValue {
+		r._type_ = rt
+	}
+	r.Right, rt = toAppropriateType(rightstr)
+	if rt != nilValue {
+		r._type_ = rt
+	}
+
 	return r
 }
 
 func toAppropriateType(str string) (interface{}, rtype) {
+
+	// 空
+	if IsBlank(str) {
+		return nil, nilValue
+	}
+
 	regInt := regexp.MustCompile(REX_INT)
 	if regInt.MatchString(str) {
 		sint, err1 := strconv.Atoi(str)
@@ -127,7 +143,7 @@ func toAppropriateType(str string) (interface{}, rtype) {
 }
 
 func extractLeftAndRight(rstr string) (left, right string, lopen, ropen bool) {
-	lr := SplitIgnoreBlank(rstr, ",")
+	lr := strings.Split(rstr, ",")
 	if len(lr) == 2 {
 		lopen = strings.HasPrefix(lr[0], "(")
 		ropen = strings.HasSuffix(lr[1], ")")
