@@ -195,7 +195,8 @@ type strBuilder struct {
 }
 
 // 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息,直接panic)
-// 比如 str := SBuilder().Append("abc=123").Append('\n').String()
+// str := SBuilder().Append("abc=123").Append('\n').String()
+// TODO 等着测试下性能,看看用字符数组来实现是不是效率高些
 func StringBuilder() *strBuilder {
 	sb := new(strBuilder)
 	sb.buf = bytes.NewBuffer(nil)
@@ -204,25 +205,25 @@ func StringBuilder() *strBuilder {
 
 // 添加任意可以生成string的东西
 func (sb *strBuilder) Append(o interface{}) *strBuilder {
-	var str string
+	var err error
 	switch o.(type) {
 	case byte:
 		b, _ := o.(byte)
-		str = string(b)
+		err = sb.buf.WriteByte(b)
 	case rune:
 		r, _ := o.(rune)
-		str = string(r)
+		_, err = sb.buf.WriteRune(r)
 	default:
-		str = fmt.Sprint(o)
+		str := fmt.Sprint(o)
+		_, err = sb.buf.WriteString(str)
 	}
-	_, err := sb.buf.WriteString(str)
 	if err != nil {
 		panic(err)
 	}
 	return sb
 }
 
-// 行到结尾了, 换行
+// 行结尾了换行(EOL End Of Line)
 func (sb *strBuilder) EOL() *strBuilder {
 	sb.Append('\n')
 	return sb
