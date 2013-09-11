@@ -4,11 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
-	"time"
 	"unicode/utf8"
 )
 
@@ -198,7 +195,7 @@ type stringBuilder struct {
 }
 
 // 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息,直接panic)
-// 比如 str := SBuilder().Append("abc=123").AppendByte('\n').String()
+// 比如 str := SBuilder().Append("abc=123").Append('\n').String()
 func SBuilder() *stringBuilder {
 	sb := new(stringBuilder)
 	sb.buf = bytes.NewBuffer(nil)
@@ -209,55 +206,14 @@ func SBuilder() *stringBuilder {
 func (sb *stringBuilder) Append(o interface{}) *stringBuilder {
 	var str string
 	switch o.(type) {
-	case string:
-		str, _ = o.(string)
 	case byte:
 		b, _ := o.(byte)
-		return sb.AppendByte(b)
+		str = string(b)
 	case rune:
-		ru, _ := o.(rune)
-		str = string(ru)
-	case int:
-		i, _ := o.(int)
-		str = strconv.Itoa(i)
-	case int64:
-		i64, _ := o.(int64)
-		str = string(i64)
-	case float32:
-		f, _ := o.(float32)
-		str = reflect.ValueOf(f).String()
-	case float64:
-		f64, _ := o.(float64)
-		str = reflect.ValueOf(f64).String()
-	case []string:
-		sarray, _ := o.([]string)
-		return sb.AppendStringArray(sarray)
-	case []byte:
-		barray, _ := o.([]byte)
-		return sb.AppendByteArray(barray)
-	case []int:
-		iarray, _ := o.([]int)
-		return sb.AppendIntArray(iarray)
-	case time.Time:
-		ti, _ := o.(time.Time)
-		str = ti.String()
-	case *time.Time:
-		ti2, _ := o.(*time.Time)
-		str = ti2.String()
-	case regexp.Regexp:
-		reg, _ := o.(regexp.Regexp)
-		str = reg.String()
-	case *regexp.Regexp:
-		reg2, _ := o.(*regexp.Regexp)
-		str = reg2.String()
-	case Region:
-		region, _ := o.(Region)
-		str = region.String()
-	case *Region:
-		region2, _ := o.(*Region)
-		str = region2.String()
+		r, _ := o.(rune)
+		str = string(r)
 	default:
-		panic(errors.New(fmt.Sprintf("unsupport type, value is %v", o)))
+		str = fmt.Sprint(o)
 	}
 	_, err := sb.buf.WriteString(str)
 	if err != nil {
@@ -266,67 +222,9 @@ func (sb *stringBuilder) Append(o interface{}) *stringBuilder {
 	return sb
 }
 
-// 添加字符
-func (sb *stringBuilder) AppendChar(char byte) *stringBuilder {
-	return sb.AppendByte(char)
-}
-
-// 添加字符
-func (sb *stringBuilder) AppendByte(char byte) *stringBuilder {
-	err := sb.buf.WriteByte(char)
-	if err != nil {
-		panic(err)
-	}
-	return sb
-}
-
-// 添加字符数组, 会自动添加"[]"并用","做分割
-func (sb *stringBuilder) AppendIntArray(ints []int) *stringBuilder {
-	sb.AppendByte('[')
-	for i, ival := range ints {
-		sb.AppendByte('\'').Append(strconv.Itoa(ival)).AppendByte('\'')
-		if i != len(ints)-1 {
-			sb.Append(",")
-		}
-	}
-	sb.AppendByte(']')
-	return sb
-}
-
-// 添加字符数组, 会自动添加"[]"并用","做分割
-func (sb *stringBuilder) AppendCharArray(chars []byte) *stringBuilder {
-	return sb.AppendByteArray(chars)
-}
-
-// 添加字符数组, 会自动添加"[]"并用","做分割
-func (sb *stringBuilder) AppendByteArray(chars []byte) *stringBuilder {
-	sb.AppendByte('[')
-	for i, char := range chars {
-		sb.AppendByte('\'').AppendByte(char).AppendByte('\'')
-		if i != len(chars)-1 {
-			sb.Append(",")
-		}
-	}
-	sb.AppendByte(']')
-	return sb
-}
-
-// 添加字符串数组, 会自动添加"[]"并用","做分割
-func (sb *stringBuilder) AppendStringArray(strs []string) *stringBuilder {
-	sb.AppendByte('[')
-	for i, str := range strs {
-		sb.AppendByte('\'').Append(str).AppendByte('\'')
-		if i != len(strs)-1 {
-			sb.Append(",")
-		}
-	}
-	sb.AppendByte(']')
-	return sb
-}
-
 // 行到结尾了, 换行
 func (sb *stringBuilder) EndLine() *stringBuilder {
-	sb.AppendChar('\n')
+	sb.Append('\n')
 	return sb
 }
 
