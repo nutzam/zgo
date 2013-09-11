@@ -34,17 +34,12 @@ func (r *Region) String() string {
 	} else {
 		sb.Append("[")
 	}
-	switch r._type_ {
-	case intRegion:
-		sb.Append(r.LeftInt()).Append(",").Append(r.RightInt())
-	case longRegion:
-		sb.Append(r.LeftLong()).Append(",").Append(r.RightLong())
-	case floatRegion:
-		sb.Append(r.LeftFloat()).Append(",").Append(r.RightFloat())
-	case float64Region:
-		sb.Append(r.LeftFloat64()).Append(",").Append(r.RightFloat64())
-	case dateRegion:
-		sb.Append(r.LeftDate()).Append(",").Append(r.RightDate())
+	if r.HasLeft() {
+		sb.Append(r.Left)
+	}
+	sb.Append(",")
+	if r.HasRight() {
+		sb.Append(r.Right)
 	}
 	if r.RightOpen {
 		sb.Append(")")
@@ -157,6 +152,14 @@ func extractLeftAndRight(rstr string) (left, right string, lopen, ropen bool) {
 		return
 	}
 	panic("wrong format for region, " + rstr)
+}
+
+func (r *Region) HasLeft() bool {
+	return r.Left != nil
+}
+
+func (r *Region) HasRight() bool {
+	return r.Right != nil
 }
 
 func (r *Region) LeftInt() int {
