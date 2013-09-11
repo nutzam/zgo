@@ -190,20 +190,20 @@ func AlignRight(str string, width int, char byte) string {
 	return str
 }
 
-type stringBuilder struct {
+type strBuilder struct {
 	buf *bytes.Buffer
 }
 
 // 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息,直接panic)
 // 比如 str := SBuilder().Append("abc=123").Append('\n').String()
-func SBuilder() *stringBuilder {
-	sb := new(stringBuilder)
+func StringBuilder() *strBuilder {
+	sb := new(strBuilder)
 	sb.buf = bytes.NewBuffer(nil)
 	return sb
 }
 
 // 添加任意可以生成string的东西
-func (sb *stringBuilder) Append(o interface{}) *stringBuilder {
+func (sb *strBuilder) Append(o interface{}) *strBuilder {
 	var str string
 	switch o.(type) {
 	case byte:
@@ -223,17 +223,17 @@ func (sb *stringBuilder) Append(o interface{}) *stringBuilder {
 }
 
 // 行到结尾了, 换行
-func (sb *stringBuilder) EndLine() *stringBuilder {
+func (sb *strBuilder) EndLine() *strBuilder {
 	sb.Append('\n')
 	return sb
 }
 
 // 返回字符串
-func (sb *stringBuilder) String() string {
+func (sb *strBuilder) String() string {
 	return sb.buf.String()
 }
 
 // 写入的字符串长度
-func (sb *stringBuilder) Len() int {
+func (sb *strBuilder) Len() int {
 	return sb.buf.Len()
 }

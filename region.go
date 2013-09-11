@@ -27,7 +27,7 @@ type Region struct {
 }
 
 func (r *Region) String() string {
-	sb := SBuilder()
+	sb := StringBuilder()
 	if r.LeftOpen {
 		sb.Append("(")
 	} else {
