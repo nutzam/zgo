@@ -90,6 +90,8 @@ func toAppropriateType(str string) (interface{}, rtype) {
 	// 空
 	if IsBlank(str) {
 		return nil, nilValue
+	} else {
+		str = Trim(str)
 	}
 
 	regInt := regexp.MustCompile(REX_INT)
