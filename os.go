@@ -2,28 +2,20 @@ package z
 
 import (
 	"archive/tar"
+	"bufio"
 	"bytes"
 	"compress/gzip"
+	"crypto/md5"
 	"crypto/sha1"
 	"fmt"
+	"hash"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
-	"unsafe"
 )
-
-/*
-#cgo CFLAGS: -DPNG_DEBUG=1
-#cgo linux CFLAGS: -DLINUX=1
-#cgo LDFLAGS: -lpng
-#include <stdio.h>
-#include <stdlib.h>
-#include "md5.h"
-*/
-import "C"
 
 // 获取本地MAC地址，只限Linux系统
 func GetMac() string {
@@ -48,16 +40,21 @@ func GetMac() string {
 
 // 计算一个文件的 MD5 指纹, 文件路径为磁盘绝对路径
 func MD5(ph string) string {
-	md5 := C.CString("00000000000000000000000000000000")
-	file := C.CString(ph)
-	C.md5sum(file, md5)
-	md5sum := C.GoString(md5)
-	defer C.free(unsafe.Pointer(md5))
-	defer C.free(unsafe.Pointer(file))
-	if md5sum == "00000000000000000000000000000000" {
+	return Finger(md5.New(), ph)
+}
+
+// 将磁盘某个文件按照某种算法计算成加密指纹
+func Finger(h hash.Hash, ph string) string {
+	// 打开文件
+	f, err := os.Open(ph)
+	if err != nil {
 		return ""
 	}
-	return md5sum
+	defer f.Close()
+	// 读取
+	io.Copy(h, bufio.NewReader(f))
+	// 返回计算结果
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 // 对字符串进行SHA1哈希
