@@ -17,16 +17,6 @@ import (
 	"strings"
 )
 
-<<<<<<< HEAD
-=======
-/*
-#include <stdio.h>
-#include <stdlib.h>
-#include "md5.h"
-*/
-import "C"
-
->>>>>>> e1142ffeb8834a749d4220525684e12994880d6c
 // 获取本地MAC地址，只限Linux系统
 func GetMac() string {
 	var mac string
