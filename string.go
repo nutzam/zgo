@@ -3,6 +3,7 @@ package z
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -189,63 +190,51 @@ func AlignRight(str string, width int, char byte) string {
 	return str
 }
 
-type stringBuilder struct {
+type strBuilder struct {
 	buf *bytes.Buffer
 }
 
 // 提供一个类似java中stringBuilder对象,支持链式调用(不返回错误信息,直接panic)
-// 比如 str := SBuilder().Append("abc=123").AppendByte('\n').String()
-func SBuilder() *stringBuilder {
-	sb := new(stringBuilder)
+// str := SBuilder().Append("abc=123").Append('\n').String()
+// TODO 等着测试下性能,看看用字符数组来实现是不是效率高些
+func StringBuilder() *strBuilder {
+	sb := new(strBuilder)
 	sb.buf = bytes.NewBuffer(nil)
 	return sb
 }
 
-// 添加字符串
-func (sb *stringBuilder) Append(str string) *stringBuilder {
-	_, err := sb.buf.WriteString(str)
+// 添加任意可以生成string的东西
+func (sb *strBuilder) Append(o interface{}) *strBuilder {
+	var err error
+	switch o.(type) {
+	case byte:
+		b, _ := o.(byte)
+		err = sb.buf.WriteByte(b)
+	case rune:
+		r, _ := o.(rune)
+		_, err = sb.buf.WriteRune(r)
+	default:
+		str := fmt.Sprint(o)
+		_, err = sb.buf.WriteString(str)
+	}
 	if err != nil {
 		panic(err)
 	}
 	return sb
 }
 
-// 添加字符
-func (sb *stringBuilder) AppendByte(char byte) *stringBuilder {
-	err := sb.buf.WriteByte(char)
-	if err != nil {
-		panic(err)
-	}
-	return sb
-}
-
-// 添加字符数组, 会自动添加"[]"并用","做分割
-func (sb *stringBuilder) AppendByteArray(chars []byte) *stringBuilder {
-	sb.AppendByte('[')
-	for i, char := range chars {
-		sb.AppendByte('\'').AppendByte(char).AppendByte('\'')
-		if i != len(chars)-1 {
-			sb.Append(", ")
-		}
-	}
-	sb.AppendByte(']')
-	return sb
-}
-
-// 添加字符串数组, 会自动添加"[]"并用","做分割
-func (sb *stringBuilder) AppendStringArray(strs []string) *stringBuilder {
-	sb.AppendByte('[')
-	for i, str := range strs {
-		sb.AppendByte('\'').Append(str).AppendByte('\'')
-		if i != len(strs)-1 {
-			sb.Append(", ")
-		}
-	}
-	sb.AppendByte(']')
+// 行结尾了换行(EOL End Of Line)
+func (sb *strBuilder) EOL() *strBuilder {
+	sb.Append('\n')
 	return sb
 }
 
 // 返回字符串
-func (sb *stringBuilder) String() string {
+func (sb *strBuilder) String() string {
 	return sb.buf.String()
+}
+
+// 写入的字符串长度
+func (sb *strBuilder) Len() int {
+	return sb.buf.Len()
 }
