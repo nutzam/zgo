@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+const FORMAT_DATE string = "2006-01-02"
+const FORMAT_DATE_TIME string = "2006-01-02 15:04:05"
+
 // 获取本地时间戳纳秒,以字符串格式返回
 func UnixNano() string {
 	return strconv.FormatInt(time.Now().UnixNano(), 10)
@@ -28,5 +31,15 @@ func DAsec(off int) int {
 
 // 获得当前系统时间
 func GetTime() string {
-	return time.Now().Format("2006/01/02 15:04:05")
+	return time.Now().Format(FORMAT_DATE_TIME)
+}
+
+func ParseDate(dstr string) time.Time {
+	t, _ := time.Parse(FORMAT_DATE, dstr)
+	return t
+}
+
+func ParseDateTime(dtstr string) time.Time {
+	t, _ := time.Parse(FORMAT_DATE_TIME, dtstr)
+	return t
 }
