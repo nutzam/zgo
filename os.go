@@ -109,7 +109,7 @@ func Untar(file, path string) error {
 			return err
 		}
 		if hdr.FileInfo().IsDir() {
-			os.Mkdir(path + string(os.PathSeparator) + hdr.Name)
+			os.Mkdir(path + string(os.PathSeparator) + hdr.Name，os.ModeDir|0755)
 		}
 		fw, err := os.OpenFile(path+string(os.PathSeparator)+hdr.Name, os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
