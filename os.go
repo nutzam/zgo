@@ -2,6 +2,7 @@ package z
 
 import (
 	"archive/tar"
+	"archive/zip"
 	"bufio"
 	"bytes"
 	"compress/gzip"
@@ -10,9 +11,11 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -164,5 +167,63 @@ func LinuxBash(sh string) error {
 	if len(sErr) != 0 {
 		return fmt.Errorf(sErr)
 	}
+	return nil
+}
+
+// 创建压缩文件
+func CreateZip(path, ph string) error {
+	// 创建写入缓冲区
+	buf := new(bytes.Buffer)
+	// 创建压缩缓冲区
+	w := zip.NewWriter(buf)
+	// 文件列表
+	files := make([]string, 0)
+	// 读取文件列表
+	err := filepath.Walk(path, func(aph string, f os.FileInfo, err error) error {
+		// 文件不存在
+		if f == nil {
+			return nil
+		}
+		// 跳过文件夹
+		if f.IsDir() {
+			return nil
+		}
+		files = append(files, aph)
+		return nil
+	})
+	// 判断是否出错
+	if err != nil {
+		return err
+	}
+	// 将文件读取
+	for _, file := range files {
+		f, err := w.Create(file)
+		if err != nil {
+			return err
+		}
+		r, err := os.Open(file)
+		if err != nil {
+			return err
+		}
+		data, err := ioutil.ReadAll(r)
+		if err != nil {
+			return err
+		}
+		_, err = f.Write(data)
+		if err != nil {
+			return err
+		}
+		r.Close()
+	}
+	// 关闭缓冲区
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+	// 写入
+	FileWF(ph, func(f *os.File) {
+		f.Write(buf.Bytes())
+	})
+	// 返回
 	return nil
 }
