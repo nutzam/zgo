@@ -252,3 +252,13 @@ func DirSize(path string) int64 {
 	})
 	return size
 }
+
+// 获取路径目录
+func DirName(path string) string {
+	dirs := strings.Split(path, string(os.PathSeparator))
+	var dir string
+	for i := 0; i < len(dirs)-1; i++ {
+		dir += dirs[i] + string(os.PathSeparator)
+	}
+	return dir
+}

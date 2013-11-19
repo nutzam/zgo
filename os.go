@@ -111,16 +111,18 @@ func Untar(file, path string) error {
 		} else if err != nil {
 			return err
 		}
-		// 打开文件
-		fw, err := os.OpenFile(path+string(os.PathSeparator)+hdr.Name, os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			return err
-		}
-		defer fw.Close()
-		// 写文件
-		_, err = io.Copy(fw, tr)
-		if err != nil {
-			return err
+		if hdr.FileInfo().IsDir() {
+			os.MkdirAll(path+string(os.PathSeparator)+hdr.Name, hdr.FileInfo().Mode())
+		} else {
+			fw, err := os.OpenFile(path+string(os.PathSeparator)+hdr.Name, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, hdr.FileInfo().Mode())
+			if err != nil {
+				return err
+			}
+			defer fw.Close()
+			_, err = io.Copy(fw, tr)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
