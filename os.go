@@ -190,7 +190,7 @@ func CreateZip(path, ph string) error {
 		if f.IsDir() {
 			return nil
 		}
-		files = append(files, strings.Trim(Range(aph, len(path), len(aph)), "/"))
+		files = append(files, Range(aph, len(path), len(aph)))
 		return nil
 	})
 	// 判断是否出错
