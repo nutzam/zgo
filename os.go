@@ -190,7 +190,7 @@ func CreateZip(path, ph string) error {
 		if f.IsDir() {
 			return nil
 		}
-		files = append(files, aph)
+		files = append(files, Range(aph, len(path), len(aph)))
 		return nil
 	})
 	// 判断是否出错
@@ -228,4 +228,15 @@ func CreateZip(path, ph string) error {
 	})
 	// 返回
 	return nil
+}
+
+// 字符串
+func Range(str string, start, end int) string {
+	var data string
+	for i, s := range str {
+		if i >= start && i < end {
+			data += string(s)
+		}
+	}
+	return data
 }
