@@ -49,7 +49,6 @@ func Exists(name string) bool {
 }
 
 // 判断一个路径是否存在,且允许附加条件
-// 判断一个路径是否存在
 func ExistsF(name string, callback func(os.FileInfo) bool) bool {
 	fi, err := os.Stat(name)
 	if err != nil && os.IsNotExist(err) {
