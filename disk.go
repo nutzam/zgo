@@ -57,6 +57,34 @@ func ExistsF(name string, callback func(os.FileInfo) bool) bool {
 	return callback(fi)
 }
 
+// 判断一个路径文件是否存在,且不是文件夹
+func ExistsIsFile(name string) bool {
+	fi, err := os.Stat(name)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	if fi.IsDir() {
+		return false
+	}
+	return true
+}
+
+// 判断一个路径文件是否存在,且不是文件夹
+func ExistsIsDir(name string) bool {
+	fi, err := os.Stat(name)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+	}
+	if !fi.IsDir() {
+		return false
+	}
+	return true
+}
+
 // 判断一个文件是否存在，不存在则创建
 func ExistsFile(aph string) bool {
 	if Exists(aph) {
