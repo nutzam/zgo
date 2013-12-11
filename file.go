@@ -203,3 +203,11 @@ func FileOF(ph string, flag int, callback func(*os.File)) {
 		}
 	}
 }
+
+// 强制覆盖写入文件
+func FWrite(path string, data []byte) error {
+	// 保证目录存在
+	FcheckParents(path)
+	// 写入文件
+	return ioutil.WriteFile(path, data, 0644)
+}
