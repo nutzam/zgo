@@ -240,3 +240,19 @@ func Range(str string, start, end int) string {
 	}
 	return data
 }
+
+// 返回最大值Int
+func Max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// 返回最小值Int
+func Min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
