@@ -238,3 +238,13 @@ func (sb *strBuilder) String() string {
 func (sb *strBuilder) Len() int {
 	return sb.buf.Len()
 }
+
+// 字符串转Float
+func ToFloat(data string, reData float64) float64 {
+	i, err := strconv.ParseFloat(data, 64)
+	if err != nil {
+		return reData
+	}
+	return i
+
+}
