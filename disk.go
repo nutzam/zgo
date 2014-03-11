@@ -295,7 +295,11 @@ func DirName(path string) string {
 	dirs := strings.Split(path, string(os.PathSeparator))
 	var dir string
 	for i := 0; i < len(dirs)-1; i++ {
-		dir += dirs[i] + string(os.PathSeparator)
+		if i == len(dirs)-2 {
+			dir += dirs[i]
+		} else {
+			dir += dirs[i] + string(os.PathSeparator)
+		}
 	}
 	return dir
 }
