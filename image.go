@@ -61,7 +61,7 @@ func ImageDrawRGBA(img *image.RGBA, imgcode image.Image, x, y int) {
 
 // JPEG将编码生成图片
 // 选择编码参数,质量范围从1到100,更高的是更好 &jpeg.Options{90}
-func ImageEncodeJPEG(ph string, img image.Image) error {
+func ImageEncodeJPEG(ph string, img image.Image, option int) error {
 	// 确保文件父目录存在
 	FcheckParents(ph)
 	// 打开文件等待写入
@@ -69,7 +69,7 @@ func ImageEncodeJPEG(ph string, img image.Image) error {
 	// 保证文件正常关闭
 	defer f.Close()
 	// 写入文件
-	return jpeg.Encode(f, img, &jpeg.Options{100})
+	return jpeg.Encode(f, img, &jpeg.Options{option})
 }
 
 // PNG将编码生成图片
