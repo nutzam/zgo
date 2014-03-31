@@ -59,6 +59,16 @@ func ImageDrawRGBA(img *image.RGBA, imgcode image.Image, x, y int) {
 	draw.Draw(img, img.Bounds(), imgcode, image.Pt(x, y), draw.Over)
 }
 
+// 将图片绘制到图片
+func ImageDrawRGBAOffSet(img *image.RGBA, imgcode image.Image, r image.Rectangle, x, y int) {
+	// 绘制图像
+	// image.Point A点的X,Y坐标,轴向右和向下增加{0,0}
+	// image.ZP ZP is the zero Point
+	// image.Pt Pt is shorthand for Point{X, Y}
+	// r image.Rectangle img.Bounds() or img.Bounds().Add(offset)
+	draw.Draw(img, r, imgcode, image.Pt(x, y), draw.Over)
+}
+
 // JPEG将编码生成图片
 // 选择编码参数,质量范围从1到100,更高的是更好 &jpeg.Options{90}
 func ImageEncodeJPEG(ph string, img image.Image, option int) error {
