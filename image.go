@@ -9,39 +9,39 @@ import (
 )
 
 // 读取JPEG图片返回image.Image对象
-func ImageJPEG(ph string) image.Image {
+func ImageJPEG(ph string) (image.Image, error) {
 	// 打开图片文件
 	f, fileErr := os.Open(ph)
 	if fileErr != nil {
-		return nil
+		return nil, fileErr
 	}
 	// 退出时关闭文件
 	defer f.Close()
 	// 解码
 	j, jErr := jpeg.Decode(f)
 	if jErr != nil {
-		return nil
+		return nil, jErr
 	}
 	// 返回解码后的图片
-	return j
+	return j, nil
 }
 
 // 读取PNG图片返回image.Image对象
-func ImagePNG(ph string) image.Image {
+func ImagePNG(ph string) (image.Image, error) {
 	// 打开图片文件
 	f, fileErr := os.Open(ph)
 	if fileErr != nil {
-		return nil
+		return nil, fileErr
 	}
 	// 退出时关闭文件
 	defer f.Close()
 	// 解码
 	p, pErr := png.Decode(f)
 	if pErr != nil {
-		return nil
+		return nil, pErr
 	}
 	// 返回解码后的图片
-	return p
+	return p, nil
 }
 
 // 按照分辨率创建一张空白图片对象
