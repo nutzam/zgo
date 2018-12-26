@@ -41,6 +41,26 @@ func GetMac() string {
 	return Trim(mac)
 }
 
+func GetIntMac(v string) (string, error) {
+	var mac string
+	var stdout, stderr bytes.Buffer
+	cmd := exec.Command("/sbin/ifconfig", v)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	cmd.Run()
+	sOut := stdout.String()
+	sErr := stderr.String()
+	if len(sErr) == 0 {
+		rx, _ := regexp.Compile("[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}")
+		macStr := rx.FindString(strings.ToUpper(sOut))
+		str := strings.ToUpper(macStr)
+		mac = strings.Replace(str, ":", "", -1)
+	} else {
+		return mac, fmt.Errorf("%s", Trim(sErr))
+	}
+	return Trim(mac), nil
+}
+
 // 计算一个文件的 MD5 指纹, 文件路径为磁盘绝对路径
 func MD5(ph string) string {
 	return Finger(md5.New(), ph)
