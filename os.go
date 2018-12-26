@@ -41,7 +41,7 @@ func GetMac() string {
 	return Trim(mac)
 }
 
-func GetIntMac(v string) (string, error) {
+func GetIntMac(v string) string {
 	var mac string
 	var stdout, stderr bytes.Buffer
 	cmd := exec.Command("/sbin/ifconfig", v)
@@ -56,7 +56,7 @@ func GetIntMac(v string) (string, error) {
 		str := strings.ToUpper(macStr)
 		mac = strings.Replace(str, ":", "", -1)
 	} else {
-		return mac, fmt.Errorf("%s", Trim(sErr))
+		log.Panic(sErr)
 	}
 	return Trim(mac), nil
 }
