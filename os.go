@@ -58,7 +58,7 @@ func GetIntMac(v string) string {
 	} else {
 		log.Panic(sErr)
 	}
-	return Trim(mac), nil
+	return Trim(mac)
 }
 
 // 计算一个文件的 MD5 指纹, 文件路径为磁盘绝对路径
